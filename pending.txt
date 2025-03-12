@@ -1,0 +1,17 @@
+1) look at dx
+comp Circle:
+#x, #y: scalar;
+#radius: scalar;
+def area() -> scalar: return 3.14 * (#radius ** 2); enddef;
+def perimeter() -> scalar: return 2 * 3.14 * #radius; enddef;
+def move(dx: scalar, dy: scalar): #x=#x+dx; #y=#y+dx; enddef;
+endcomp;
+
+c1, c2: Circle;
+
+def totalArea(size: integer , ddd: scalar, c[]: Circle) -> scalar:
+    i: integer;
+    sum: scalar;
+
+    return sum;
+enddef;
