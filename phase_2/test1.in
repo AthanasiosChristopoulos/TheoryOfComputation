@@ -1,0 +1,23 @@
+comp Address:
+  #street: str;
+  #number: integer;
+  #city: str;
+
+  def setAddress(s: str, n: integer, c: str):
+    #street = s;
+    #number = n;
+    #city = c;
+  enddef;
+
+  def printAddress():
+    write("Address: %s %d, %s\n", #street, #number, #city);    
+  enddef;
+endcomp;
+
+
+comp Circle:
+    #x, #y: scalar;
+    #radius: scalar;
+    def area() -> scalar: return 3.14 * (#radius ** 2); enddef;
+    def perimeter(dx: scalar, dy: scalar) -> scalar: return 2 * 3.14 * #radius; enddef;
+endcomp;

@@ -1,0 +1,3502 @@
+Terminals unused in grammar
+
+    DECIMAL
+    KW_TRUE
+    KW_FALSE
+    KW_VAR
+    KW_INT
+    KW_REAL
+    KW_FUNC
+    KW_BEGIN
+    KW_PLUS
+    KW_MINUS
+    KW_MUL
+    KW_DIV
+    KW_MOD
+    KW_LESSEQUAL
+    KW_GREATEREQUAL
+    KW_LESSTHAN
+    KW_GREATHAN
+    KW_INEQ
+    KW_AND
+    KW_OR
+    KW_NOT
+    KW_EQUAL
+    KW_EXPONENT
+
+
+State 235 conflicts: 6 reduce/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: input
+
+    2 input: ε
+    3      | input variable_definition ';'
+    4      | input expr ';'
+    5      | input function_definition ';'
+    6      | input complicated_types ';'
+    7      | input commands ';'
+    8      | input macro
+
+    9 macro: KW_MACRO IDENTIFIER STRING
+   10      | KW_MACRO IDENTIFIER expr
+
+   11 $@1: ε
+
+   12 $@2: ε
+
+   13 commands: KW_IF '(' expr ')' ':' $@1 stmts $@2 else_statement KW_ENDIF
+
+   14 $@3: ε
+
+   15 $@4: ε
+
+   16 commands: KW_WHILE '(' expr ')' ':' $@3 stmts $@4 KW_ENDWHILE
+
+   17 $@5: ε
+
+   18 $@6: ε
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 KW_ENDFOR
+   20         | IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' POSINT ']' ':' KW_VARIABLE_TYPE
+   21         | IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+
+   22 else_statement: ε
+
+   23 $@7: ε
+
+   24 else_statement: KW_ELSE ':' $@7 stmts
+
+   25 step: ε
+   26     | ':' arithmetic_expr_non_empty
+
+   27 stmts: ε
+   28      | stmts loop_thing ';'
+   29      | stmts variable_definition ';'
+   30      | stmts expr ';'
+   31      | stmts commands ';'
+
+   32 loop_thing: KW_BREAK
+   33           | KW_CONTINUE
+
+   34 $@8: ε
+
+   35 complicated_types: KW_COMP IDENTIFIER $@8 ':' body_comp KW_ENDCOMP
+
+   36 body_comp: ε
+   37          | body_comp attribute_definition ';'
+   38          | body_comp function_definition_comp ';'
+   39          | body_comp expr_comp ';'
+   40          | KW_RETURN expr_comp ';'
+
+   41 attribute_definition: '#' IDENTIFIER ':' KW_VARIABLE_TYPE
+   42                     | '#' IDENTIFIER ',' attribute_definition
+
+   43 function_definition_comp: KW_DEF IDENTIFIER '(' arguments ')' return_type_comp ':' body_comp KW_ENDDEF
+
+   44 return_type_comp: ε
+   45                 | KW_FUNC_RETURN KW_VARIABLE_TYPE
+
+   46 expr_comp: ε
+   47          | NUMBERS
+   48          | '#' IDENTIFIER
+   49          | '#' IDENTIFIER '[' expr ']'
+   50          | '(' expr_comp ')'
+   51          | expr_comp EXPONENTIATION_OP expr_comp
+   52          | expr_comp CALC_OP expr_comp
+   53          | expr_comp RELATIONAL_OP expr_comp
+   54          | expr_comp LOGICAL_AND_OR_OP expr_comp
+   55          | LOGICAL_NOT_OP expr_comp
+   56          | UNARY_OP expr_comp
+   57          | '#' IDENTIFIER ASSIGNMENT_OP expr_comp
+   58          | '#' IDENTIFIER '[' expr_comp ']' ASSIGNMENT_OP expr_comp
+
+   59 func_call: IDENTIFIER '(' func_args ')'
+
+   60 func_args: ε
+   61          | expr
+   62          | STRING
+   63          | func_args ',' expr
+   64          | func_args ',' STRING
+
+   65 expr: func_call
+   66     | NUMBERS
+   67     | IDENTIFIER
+   68     | '(' expr ')'
+   69     | IDENTIFIER '[' expr ']'
+   70     | expr CALC_OP expr
+   71     | expr EXPONENTIATION_OP expr
+   72     | expr RELATIONAL_OP expr
+   73     | expr LOGICAL_AND_OR_OP expr
+   74     | LOGICAL_NOT_OP expr
+   75     | UNARY_OP expr
+   76     | IDENTIFIER ASSIGNMENT_OP expr
+   77     | IDENTIFIER '[' expr ']' ASSIGNMENT_OP expr
+
+   78 arithmetic_expr_non_empty: POSINT
+   79                          | REAL
+   80                          | IDENTIFIER
+   81                          | '(' expr ')'
+   82                          | expr EXPONENTIATION_OP expr
+   83                          | expr CALC_OP expr
+   84                          | expr RELATIONAL_OP expr
+   85                          | expr LOGICAL_AND_OR_OP expr
+   86                          | LOGICAL_NOT_OP expr
+   87                          | UNARY_OP expr
+
+   88 $@9: ε
+
+   89 $@10: ε
+
+   90 function_definition: KW_DEF KW_MAIN '(' ')' ':' $@9 body $@10 KW_ENDDEF
+
+   91 $@11: ε
+
+   92 $@12: ε
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments ')' return_type ':' $@11 body $@12 KW_ENDDEF
+
+   94 arguments: ε
+   95          | parameter_definition
+   96          | arguments ',' parameter_definition
+
+   97 parameter_definition: IDENTIFIER ':' KW_VARIABLE_TYPE
+   98                     | IDENTIFIER '[' POSINT ']' ':' KW_VARIABLE_TYPE
+   99                     | IDENTIFIER '[' ']' ':' KW_VARIABLE_TYPE
+
+  100 return_type: ε
+  101            | KW_FUNC_RETURN KW_VARIABLE_TYPE
+
+  102 body: stmts
+  103     | stmts KW_RETURN expr ';'
+
+  104 variable_definition: variable_list ':' KW_VARIABLE_TYPE
+  105                    | IDENTIFIER '[' POSINT ']' ':' KW_VARIABLE_TYPE
+  106                    | IDENTIFIER '[' ']' ':' KW_VARIABLE_TYPE
+  107                    | KW_CONST IDENTIFIER ASSIGNMENT_OP VALUE ':' KW_VARIABLE_TYPE
+
+  108 VALUE: POSINT
+  109      | REAL
+  110      | STRING
+
+  111 KW_VARIABLE_TYPE: KW_SCALAR
+  112                 | KW_INTEGER
+  113                 | KW_STR
+  114                 | KW_BOOLEAN
+  115                 | IDENTIFIER
+
+  116 NUMBERS: POSINT
+  117        | REAL
+
+  118 variable_list: IDENTIFIER
+  119              | variable_list ',' IDENTIFIER
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '#' (35) 41 42 48 49 57 58
+    '(' (40) 13 16 43 50 59 68 81 90 93
+    ')' (41) 13 16 43 50 59 68 81 90 93
+    ',' (44) 42 63 64 96 119
+    ':' (58) 13 16 19 20 21 24 26 35 41 43 90 93 97 98 99 104 105 106 107
+    ';' (59) 3 4 5 6 7 28 29 30 31 37 38 39 40 103
+    '[' (91) 19 20 21 49 58 69 77 98 99 105 106
+    ']' (93) 19 20 21 49 58 69 77 98 99 105 106
+    error (256)
+    IDENTIFIER <str> (258) 9 10 19 20 21 35 41 42 43 48 49 57 58 59 67 69 76 77 80 93 97 98 99 105 106 107 115 118 119
+    POSINT <str> (259) 20 21 78 98 105 108 116
+    STRING <str> (260) 9 62 64 110
+    DECIMAL <str> (261)
+    REAL <str> (262) 79 109 117
+    KW_IF <str> (263) 13
+    KW_ELSE <str> (264) 24
+    KW_ENDIF <str> (265) 13
+    KW_IN <str> (266) 19 21
+    KW_OF <str> (267) 21
+    KW_WHILE <str> (268) 16
+    KW_ENDWHILE <str> (269) 16
+    KW_FOR <str> (270) 19 20 21
+    KW_ENDFOR <str> (271) 19
+    KW_BREAK <str> (272) 32
+    KW_CONTINUE <str> (273) 33
+    KW_TRUE <str> (274)
+    KW_FALSE <str> (275)
+    KW_VAR <str> (276)
+    KW_INT <str> (277)
+    KW_REAL <str> (278)
+    KW_FUNC <str> (279)
+    KW_BEGIN <str> (280)
+    KW_DEF <str> (281) 43 90 93
+    KW_ENDDEF <str> (282) 43 90 93
+    KW_COMP <str> (283) 35
+    KW_ENDCOMP <str> (284) 35
+    KW_MACRO <str> (285) 9 10
+    KW_RETURN <str> (286) 40 103
+    KW_MAIN <str> (287) 90
+    KW_FUNC_RETURN <str> (288) 45 101
+    KW_INTEGER <str> (289) 112
+    KW_SCALAR <str> (290) 111
+    KW_STR <str> (291) 113
+    KW_CONST <str> (292) 107
+    KW_BOOLEAN <str> (293) 114
+    EXPONENTIATION_OP <str> (294) 51 71 82
+    CALC_OP <str> (295) 52 70 83
+    UNARY_OP <str> (296) 56 75 87
+    RELATIONAL_OP <str> (297) 53 72 84
+    LOGICAL_NOT_OP <str> (298) 55 74 86
+    LOGICAL_AND_OR_OP <str> (299) 54 73 85
+    ASSIGNMENT_OP <str> (300) 20 21 57 58 76 77 107
+    KW_PLUS (301)
+    KW_MINUS (302)
+    KW_MUL (303)
+    KW_DIV (304)
+    KW_MOD (305)
+    KW_LESSEQUAL (306)
+    KW_GREATEREQUAL (307)
+    KW_LESSTHAN (308)
+    KW_GREATHAN (309)
+    KW_INEQ (310)
+    KW_AND (311)
+    KW_OR (312)
+    KW_NOT (313)
+    KW_EQUAL (314)
+    KW_EXPONENT (315)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (69)
+        on left: 0
+    program (70)
+        on left: 1
+        on right: 0
+    input <str> (71)
+        on left: 2 3 4 5 6 7 8
+        on right: 1 3 4 5 6 7 8
+    macro <str> (72)
+        on left: 9 10
+        on right: 8
+    commands <str> (73)
+        on left: 13 16 19 20 21
+        on right: 7 31
+    $@1 (74)
+        on left: 11
+        on right: 13
+    $@2 (75)
+        on left: 12
+        on right: 13
+    $@3 (76)
+        on left: 14
+        on right: 16
+    $@4 (77)
+        on left: 15
+        on right: 16
+    $@5 (78)
+        on left: 17
+        on right: 19
+    $@6 (79)
+        on left: 18
+        on right: 19
+    else_statement <str> (80)
+        on left: 22 24
+        on right: 13
+    $@7 (81)
+        on left: 23
+        on right: 24
+    step <str> (82)
+        on left: 25 26
+        on right: 19
+    stmts <str> (83)
+        on left: 27 28 29 30 31
+        on right: 13 16 19 24 28 29 30 31 102 103
+    loop_thing <str> (84)
+        on left: 32 33
+        on right: 28
+    complicated_types <str> (85)
+        on left: 35
+        on right: 6
+    $@8 (86)
+        on left: 34
+        on right: 35
+    body_comp <str> (87)
+        on left: 36 37 38 39 40
+        on right: 35 37 38 39 43
+    attribute_definition <str> (88)
+        on left: 41 42
+        on right: 37 42
+    function_definition_comp <str> (89)
+        on left: 43
+        on right: 38
+    return_type_comp <str> (90)
+        on left: 44 45
+        on right: 43
+    expr_comp <str> (91)
+        on left: 46 47 48 49 50 51 52 53 54 55 56 57 58
+        on right: 39 40 50 51 52 53 54 55 56 57 58
+    func_call <str> (92)
+        on left: 59
+        on right: 65
+    func_args <str> (93)
+        on left: 60 61 62 63 64
+        on right: 59 63 64
+    expr <str> (94)
+        on left: 65 66 67 68 69 70 71 72 73 74 75 76 77
+        on right: 4 10 13 16 20 21 30 49 61 63 68 69 70 71 72 73 74 75 76 77 81 82 83 84 85 86 87 103
+    arithmetic_expr_non_empty <str> (95)
+        on left: 78 79 80 81 82 83 84 85 86 87
+        on right: 19 26
+    function_definition <str> (96)
+        on left: 90 93
+        on right: 5
+    $@9 (97)
+        on left: 88
+        on right: 90
+    $@10 (98)
+        on left: 89
+        on right: 90
+    $@11 (99)
+        on left: 91
+        on right: 93
+    $@12 (100)
+        on left: 92
+        on right: 93
+    arguments <str> (101)
+        on left: 94 95 96
+        on right: 43 93 96
+    parameter_definition <str> (102)
+        on left: 97 98 99
+        on right: 95 96
+    return_type <str> (103)
+        on left: 100 101
+        on right: 93
+    body <str> (104)
+        on left: 102 103
+        on right: 90 93
+    variable_definition <str> (105)
+        on left: 104 105 106 107
+        on right: 3 29
+    VALUE <str> (106)
+        on left: 108 109 110
+        on right: 107
+    KW_VARIABLE_TYPE <str> (107)
+        on left: 111 112 113 114 115
+        on right: 20 21 41 45 97 98 99 101 104 105 106 107
+    NUMBERS <str> (108)
+        on left: 116 117
+        on right: 47 66
+    variable_list <str> (109)
+        on left: 118 119
+        on right: 104 119
+
+
+State 0
+
+    0 $accept: • program $end
+
+    $default  reduce using rule 2 (input)
+
+    program  go to state 1
+    input    go to state 2
+
+
+State 1
+
+    0 $accept: program • $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 program: input •
+    3 input: input • variable_definition ';'
+    4      | input • expr ';'
+    5      | input • function_definition ';'
+    6      | input • complicated_types ';'
+    7      | input • commands ';'
+    8      | input • macro
+
+    IDENTIFIER      shift, and go to state 4
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    KW_IF           shift, and go to state 7
+    KW_WHILE        shift, and go to state 8
+    KW_FOR          shift, and go to state 9
+    KW_DEF          shift, and go to state 10
+    KW_COMP         shift, and go to state 11
+    KW_MACRO        shift, and go to state 12
+    KW_CONST        shift, and go to state 13
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 1 (program)
+
+    macro                go to state 17
+    commands             go to state 18
+    complicated_types    go to state 19
+    func_call            go to state 20
+    expr                 go to state 21
+    function_definition  go to state 22
+    variable_definition  go to state 23
+    NUMBERS              go to state 24
+    variable_list        go to state 25
+
+
+State 3
+
+    0 $accept: program $end •
+
+    $default  accept
+
+
+State 4
+
+   20 commands: IDENTIFIER • ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' POSINT ']' ':' KW_VARIABLE_TYPE
+   21         | IDENTIFIER • ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+   59 func_call: IDENTIFIER • '(' func_args ')'
+   67 expr: IDENTIFIER •
+   69     | IDENTIFIER • '[' expr ']'
+   76     | IDENTIFIER • ASSIGNMENT_OP expr
+   77     | IDENTIFIER • '[' expr ']' ASSIGNMENT_OP expr
+  105 variable_definition: IDENTIFIER • '[' POSINT ']' ':' KW_VARIABLE_TYPE
+  106                    | IDENTIFIER • '[' ']' ':' KW_VARIABLE_TYPE
+  118 variable_list: IDENTIFIER •
+
+    ASSIGNMENT_OP  shift, and go to state 26
+    '('            shift, and go to state 27
+    '['            shift, and go to state 28
+
+    ':'       reduce using rule 118 (variable_list)
+    ','       reduce using rule 118 (variable_list)
+    $default  reduce using rule 67 (expr)
+
+
+State 5
+
+  116 NUMBERS: POSINT •
+
+    $default  reduce using rule 116 (NUMBERS)
+
+
+State 6
+
+  117 NUMBERS: REAL •
+
+    $default  reduce using rule 117 (NUMBERS)
+
+
+State 7
+
+   13 commands: KW_IF • '(' expr ')' ':' $@1 stmts $@2 else_statement KW_ENDIF
+
+    '('  shift, and go to state 29
+
+
+State 8
+
+   16 commands: KW_WHILE • '(' expr ')' ':' $@3 stmts $@4 KW_ENDWHILE
+
+    '('  shift, and go to state 30
+
+
+State 9
+
+   19 commands: KW_FOR • IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 KW_ENDFOR
+
+    IDENTIFIER  shift, and go to state 31
+
+
+State 10
+
+   90 function_definition: KW_DEF • KW_MAIN '(' ')' ':' $@9 body $@10 KW_ENDDEF
+   93                    | KW_DEF • IDENTIFIER '(' arguments ')' return_type ':' $@11 body $@12 KW_ENDDEF
+
+    IDENTIFIER  shift, and go to state 32
+    KW_MAIN     shift, and go to state 33
+
+
+State 11
+
+   35 complicated_types: KW_COMP • IDENTIFIER $@8 ':' body_comp KW_ENDCOMP
+
+    IDENTIFIER  shift, and go to state 34
+
+
+State 12
+
+    9 macro: KW_MACRO • IDENTIFIER STRING
+   10      | KW_MACRO • IDENTIFIER expr
+
+    IDENTIFIER  shift, and go to state 35
+
+
+State 13
+
+  107 variable_definition: KW_CONST • IDENTIFIER ASSIGNMENT_OP VALUE ':' KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 36
+
+
+State 14
+
+   75 expr: UNARY_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 38
+    NUMBERS    go to state 24
+
+
+State 15
+
+   74 expr: LOGICAL_NOT_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 39
+    NUMBERS    go to state 24
+
+
+State 16
+
+   68 expr: '(' • expr ')'
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 40
+    NUMBERS    go to state 24
+
+
+State 17
+
+    8 input: input macro •
+
+    $default  reduce using rule 8 (input)
+
+
+State 18
+
+    7 input: input commands • ';'
+
+    ';'  shift, and go to state 41
+
+
+State 19
+
+    6 input: input complicated_types • ';'
+
+    ';'  shift, and go to state 42
+
+
+State 20
+
+   65 expr: func_call •
+
+    $default  reduce using rule 65 (expr)
+
+
+State 21
+
+    4 input: input expr • ';'
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ';'                shift, and go to state 47
+
+
+State 22
+
+    5 input: input function_definition • ';'
+
+    ';'  shift, and go to state 48
+
+
+State 23
+
+    3 input: input variable_definition • ';'
+
+    ';'  shift, and go to state 49
+
+
+State 24
+
+   66 expr: NUMBERS •
+
+    $default  reduce using rule 66 (expr)
+
+
+State 25
+
+  104 variable_definition: variable_list • ':' KW_VARIABLE_TYPE
+  119 variable_list: variable_list • ',' IDENTIFIER
+
+    ':'  shift, and go to state 50
+    ','  shift, and go to state 51
+
+
+State 26
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP • '[' expr KW_FOR IDENTIFIER ':' POSINT ']' ':' KW_VARIABLE_TYPE
+   21         | IDENTIFIER ASSIGNMENT_OP • '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+   76 expr: IDENTIFIER ASSIGNMENT_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+    '['             shift, and go to state 52
+
+    func_call  go to state 20
+    expr       go to state 53
+    NUMBERS    go to state 24
+
+
+State 27
+
+   59 func_call: IDENTIFIER '(' • func_args ')'
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    STRING          shift, and go to state 54
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 60 (func_args)
+
+    func_call  go to state 20
+    func_args  go to state 55
+    expr       go to state 56
+    NUMBERS    go to state 24
+
+
+State 28
+
+   69 expr: IDENTIFIER '[' • expr ']'
+   77     | IDENTIFIER '[' • expr ']' ASSIGNMENT_OP expr
+  105 variable_definition: IDENTIFIER '[' • POSINT ']' ':' KW_VARIABLE_TYPE
+  106                    | IDENTIFIER '[' • ']' ':' KW_VARIABLE_TYPE
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 57
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    ']'             shift, and go to state 58
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 59
+    NUMBERS    go to state 24
+
+
+State 29
+
+   13 commands: KW_IF '(' • expr ')' ':' $@1 stmts $@2 else_statement KW_ENDIF
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 60
+    NUMBERS    go to state 24
+
+
+State 30
+
+   16 commands: KW_WHILE '(' • expr ')' ':' $@3 stmts $@4 KW_ENDWHILE
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 61
+    NUMBERS    go to state 24
+
+
+State 31
+
+   19 commands: KW_FOR IDENTIFIER • KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 KW_ENDFOR
+
+    KW_IN  shift, and go to state 62
+
+
+State 32
+
+   93 function_definition: KW_DEF IDENTIFIER • '(' arguments ')' return_type ':' $@11 body $@12 KW_ENDDEF
+
+    '('  shift, and go to state 63
+
+
+State 33
+
+   90 function_definition: KW_DEF KW_MAIN • '(' ')' ':' $@9 body $@10 KW_ENDDEF
+
+    '('  shift, and go to state 64
+
+
+State 34
+
+   35 complicated_types: KW_COMP IDENTIFIER • $@8 ':' body_comp KW_ENDCOMP
+
+    $default  reduce using rule 34 ($@8)
+
+    $@8  go to state 65
+
+
+State 35
+
+    9 macro: KW_MACRO IDENTIFIER • STRING
+   10      | KW_MACRO IDENTIFIER • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    STRING          shift, and go to state 66
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 67
+    NUMBERS    go to state 24
+
+
+State 36
+
+  107 variable_definition: KW_CONST IDENTIFIER • ASSIGNMENT_OP VALUE ':' KW_VARIABLE_TYPE
+
+    ASSIGNMENT_OP  shift, and go to state 68
+
+
+State 37
+
+   59 func_call: IDENTIFIER • '(' func_args ')'
+   67 expr: IDENTIFIER •
+   69     | IDENTIFIER • '[' expr ']'
+   76     | IDENTIFIER • ASSIGNMENT_OP expr
+   77     | IDENTIFIER • '[' expr ']' ASSIGNMENT_OP expr
+
+    ASSIGNMENT_OP  shift, and go to state 69
+    '('            shift, and go to state 27
+    '['            shift, and go to state 70
+
+    $default  reduce using rule 67 (expr)
+
+
+State 38
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   75     | UNARY_OP expr •
+
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 75 (expr)
+
+
+State 39
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   74     | LOGICAL_NOT_OP expr •
+
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 74 (expr)
+
+
+State 40
+
+   68 expr: '(' expr • ')'
+   70     | expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ')'                shift, and go to state 71
+
+
+State 41
+
+    7 input: input commands ';' •
+
+    $default  reduce using rule 7 (input)
+
+
+State 42
+
+    6 input: input complicated_types ';' •
+
+    $default  reduce using rule 6 (input)
+
+
+State 43
+
+   71 expr: expr EXPONENTIATION_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 72
+    NUMBERS    go to state 24
+
+
+State 44
+
+   70 expr: expr CALC_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 73
+    NUMBERS    go to state 24
+
+
+State 45
+
+   72 expr: expr RELATIONAL_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 74
+    NUMBERS    go to state 24
+
+
+State 46
+
+   73 expr: expr LOGICAL_AND_OR_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 75
+    NUMBERS    go to state 24
+
+
+State 47
+
+    4 input: input expr ';' •
+
+    $default  reduce using rule 4 (input)
+
+
+State 48
+
+    5 input: input function_definition ';' •
+
+    $default  reduce using rule 5 (input)
+
+
+State 49
+
+    3 input: input variable_definition ';' •
+
+    $default  reduce using rule 3 (input)
+
+
+State 50
+
+  104 variable_definition: variable_list ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 81
+
+
+State 51
+
+  119 variable_list: variable_list ',' • IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 82
+
+
+State 52
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' • expr KW_FOR IDENTIFIER ':' POSINT ']' ':' KW_VARIABLE_TYPE
+   21         | IDENTIFIER ASSIGNMENT_OP '[' • expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 83
+    NUMBERS    go to state 24
+
+
+State 53
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   76     | IDENTIFIER ASSIGNMENT_OP expr •
+
+    $default  reduce using rule 76 (expr)
+
+
+State 54
+
+   62 func_args: STRING •
+
+    $default  reduce using rule 62 (func_args)
+
+
+State 55
+
+   59 func_call: IDENTIFIER '(' func_args • ')'
+   63 func_args: func_args • ',' expr
+   64          | func_args • ',' STRING
+
+    ')'  shift, and go to state 84
+    ','  shift, and go to state 85
+
+
+State 56
+
+   61 func_args: expr •
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 61 (func_args)
+
+
+State 57
+
+  105 variable_definition: IDENTIFIER '[' POSINT • ']' ':' KW_VARIABLE_TYPE
+  116 NUMBERS: POSINT •
+
+    ']'  shift, and go to state 86
+
+    $default  reduce using rule 116 (NUMBERS)
+
+
+State 58
+
+  106 variable_definition: IDENTIFIER '[' ']' • ':' KW_VARIABLE_TYPE
+
+    ':'  shift, and go to state 87
+
+
+State 59
+
+   69 expr: IDENTIFIER '[' expr • ']'
+   70     | expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   77     | IDENTIFIER '[' expr • ']' ASSIGNMENT_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ']'                shift, and go to state 88
+
+
+State 60
+
+   13 commands: KW_IF '(' expr • ')' ':' $@1 stmts $@2 else_statement KW_ENDIF
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ')'                shift, and go to state 89
+
+
+State 61
+
+   16 commands: KW_WHILE '(' expr • ')' ':' $@3 stmts $@4 KW_ENDWHILE
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ')'                shift, and go to state 90
+
+
+State 62
+
+   19 commands: KW_FOR IDENTIFIER KW_IN • '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 KW_ENDFOR
+
+    '['  shift, and go to state 91
+
+
+State 63
+
+   93 function_definition: KW_DEF IDENTIFIER '(' • arguments ')' return_type ':' $@11 body $@12 KW_ENDDEF
+
+    IDENTIFIER  shift, and go to state 92
+
+    $default  reduce using rule 94 (arguments)
+
+    arguments             go to state 93
+    parameter_definition  go to state 94
+
+
+State 64
+
+   90 function_definition: KW_DEF KW_MAIN '(' • ')' ':' $@9 body $@10 KW_ENDDEF
+
+    ')'  shift, and go to state 95
+
+
+State 65
+
+   35 complicated_types: KW_COMP IDENTIFIER $@8 • ':' body_comp KW_ENDCOMP
+
+    ':'  shift, and go to state 96
+
+
+State 66
+
+    9 macro: KW_MACRO IDENTIFIER STRING •
+
+    $default  reduce using rule 9 (macro)
+
+
+State 67
+
+   10 macro: KW_MACRO IDENTIFIER expr •
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 10 (macro)
+
+
+State 68
+
+  107 variable_definition: KW_CONST IDENTIFIER ASSIGNMENT_OP • VALUE ':' KW_VARIABLE_TYPE
+
+    POSINT  shift, and go to state 97
+    STRING  shift, and go to state 98
+    REAL    shift, and go to state 99
+
+    VALUE  go to state 100
+
+
+State 69
+
+   76 expr: IDENTIFIER ASSIGNMENT_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 53
+    NUMBERS    go to state 24
+
+
+State 70
+
+   69 expr: IDENTIFIER '[' • expr ']'
+   77     | IDENTIFIER '[' • expr ']' ASSIGNMENT_OP expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 59
+    NUMBERS    go to state 24
+
+
+State 71
+
+   68 expr: '(' expr ')' •
+
+    $default  reduce using rule 68 (expr)
+
+
+State 72
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   71     | expr EXPONENTIATION_OP expr •
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 71 (expr)
+
+
+State 73
+
+   70 expr: expr • CALC_OP expr
+   70     | expr CALC_OP expr •
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 70 (expr)
+
+
+State 74
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   72     | expr RELATIONAL_OP expr •
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 72 (expr)
+
+
+State 75
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   73     | expr LOGICAL_AND_OR_OP expr •
+
+    $default  reduce using rule 73 (expr)
+
+
+State 76
+
+  115 KW_VARIABLE_TYPE: IDENTIFIER •
+
+    $default  reduce using rule 115 (KW_VARIABLE_TYPE)
+
+
+State 77
+
+  112 KW_VARIABLE_TYPE: KW_INTEGER •
+
+    $default  reduce using rule 112 (KW_VARIABLE_TYPE)
+
+
+State 78
+
+  111 KW_VARIABLE_TYPE: KW_SCALAR •
+
+    $default  reduce using rule 111 (KW_VARIABLE_TYPE)
+
+
+State 79
+
+  113 KW_VARIABLE_TYPE: KW_STR •
+
+    $default  reduce using rule 113 (KW_VARIABLE_TYPE)
+
+
+State 80
+
+  114 KW_VARIABLE_TYPE: KW_BOOLEAN •
+
+    $default  reduce using rule 114 (KW_VARIABLE_TYPE)
+
+
+State 81
+
+  104 variable_definition: variable_list ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 104 (variable_definition)
+
+
+State 82
+
+  119 variable_list: variable_list ',' IDENTIFIER •
+
+    $default  reduce using rule 119 (variable_list)
+
+
+State 83
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' expr • KW_FOR IDENTIFIER ':' POSINT ']' ':' KW_VARIABLE_TYPE
+   21         | IDENTIFIER ASSIGNMENT_OP '[' expr • KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    KW_FOR             shift, and go to state 101
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+
+State 84
+
+   59 func_call: IDENTIFIER '(' func_args ')' •
+
+    $default  reduce using rule 59 (func_call)
+
+
+State 85
+
+   63 func_args: func_args ',' • expr
+   64          | func_args ',' • STRING
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    STRING          shift, and go to state 102
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 103
+    NUMBERS    go to state 24
+
+
+State 86
+
+  105 variable_definition: IDENTIFIER '[' POSINT ']' • ':' KW_VARIABLE_TYPE
+
+    ':'  shift, and go to state 104
+
+
+State 87
+
+  106 variable_definition: IDENTIFIER '[' ']' ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 105
+
+
+State 88
+
+   69 expr: IDENTIFIER '[' expr ']' •
+   77     | IDENTIFIER '[' expr ']' • ASSIGNMENT_OP expr
+
+    ASSIGNMENT_OP  shift, and go to state 106
+
+    $default  reduce using rule 69 (expr)
+
+
+State 89
+
+   13 commands: KW_IF '(' expr ')' • ':' $@1 stmts $@2 else_statement KW_ENDIF
+
+    ':'  shift, and go to state 107
+
+
+State 90
+
+   16 commands: KW_WHILE '(' expr ')' • ':' $@3 stmts $@4 KW_ENDWHILE
+
+    ':'  shift, and go to state 108
+
+
+State 91
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' • arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 KW_ENDFOR
+
+    IDENTIFIER      shift, and go to state 109
+    POSINT          shift, and go to state 110
+    REAL            shift, and go to state 111
+    UNARY_OP        shift, and go to state 112
+    LOGICAL_NOT_OP  shift, and go to state 113
+    '('             shift, and go to state 114
+
+    func_call                  go to state 20
+    expr                       go to state 115
+    arithmetic_expr_non_empty  go to state 116
+    NUMBERS                    go to state 24
+
+
+State 92
+
+   97 parameter_definition: IDENTIFIER • ':' KW_VARIABLE_TYPE
+   98                     | IDENTIFIER • '[' POSINT ']' ':' KW_VARIABLE_TYPE
+   99                     | IDENTIFIER • '[' ']' ':' KW_VARIABLE_TYPE
+
+    '['  shift, and go to state 117
+    ':'  shift, and go to state 118
+
+
+State 93
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments • ')' return_type ':' $@11 body $@12 KW_ENDDEF
+   96 arguments: arguments • ',' parameter_definition
+
+    ')'  shift, and go to state 119
+    ','  shift, and go to state 120
+
+
+State 94
+
+   95 arguments: parameter_definition •
+
+    $default  reduce using rule 95 (arguments)
+
+
+State 95
+
+   90 function_definition: KW_DEF KW_MAIN '(' ')' • ':' $@9 body $@10 KW_ENDDEF
+
+    ':'  shift, and go to state 121
+
+
+State 96
+
+   35 complicated_types: KW_COMP IDENTIFIER $@8 ':' • body_comp KW_ENDCOMP
+
+    KW_RETURN  shift, and go to state 122
+
+    $default  reduce using rule 36 (body_comp)
+
+    body_comp  go to state 123
+
+
+State 97
+
+  108 VALUE: POSINT •
+
+    $default  reduce using rule 108 (VALUE)
+
+
+State 98
+
+  110 VALUE: STRING •
+
+    $default  reduce using rule 110 (VALUE)
+
+
+State 99
+
+  109 VALUE: REAL •
+
+    $default  reduce using rule 109 (VALUE)
+
+
+State 100
+
+  107 variable_definition: KW_CONST IDENTIFIER ASSIGNMENT_OP VALUE • ':' KW_VARIABLE_TYPE
+
+    ':'  shift, and go to state 124
+
+
+State 101
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR • IDENTIFIER ':' POSINT ']' ':' KW_VARIABLE_TYPE
+   21         | IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR • IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 125
+
+
+State 102
+
+   64 func_args: func_args ',' STRING •
+
+    $default  reduce using rule 64 (func_args)
+
+
+State 103
+
+   63 func_args: func_args ',' expr •
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 63 (func_args)
+
+
+State 104
+
+  105 variable_definition: IDENTIFIER '[' POSINT ']' ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 126
+
+
+State 105
+
+  106 variable_definition: IDENTIFIER '[' ']' ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 106 (variable_definition)
+
+
+State 106
+
+   77 expr: IDENTIFIER '[' expr ']' ASSIGNMENT_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 127
+    NUMBERS    go to state 24
+
+
+State 107
+
+   13 commands: KW_IF '(' expr ')' ':' • $@1 stmts $@2 else_statement KW_ENDIF
+
+    $default  reduce using rule 11 ($@1)
+
+    $@1  go to state 128
+
+
+State 108
+
+   16 commands: KW_WHILE '(' expr ')' ':' • $@3 stmts $@4 KW_ENDWHILE
+
+    $default  reduce using rule 14 ($@3)
+
+    $@3  go to state 129
+
+
+State 109
+
+   59 func_call: IDENTIFIER • '(' func_args ')'
+   67 expr: IDENTIFIER •
+   69     | IDENTIFIER • '[' expr ']'
+   76     | IDENTIFIER • ASSIGNMENT_OP expr
+   77     | IDENTIFIER • '[' expr ']' ASSIGNMENT_OP expr
+   80 arithmetic_expr_non_empty: IDENTIFIER •
+
+    ASSIGNMENT_OP  shift, and go to state 69
+    '('            shift, and go to state 27
+    '['            shift, and go to state 70
+
+    ']'       reduce using rule 80 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 80 (arithmetic_expr_non_empty)
+    $default  reduce using rule 67 (expr)
+
+
+State 110
+
+   78 arithmetic_expr_non_empty: POSINT •
+  116 NUMBERS: POSINT •
+
+    ']'       reduce using rule 78 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 78 (arithmetic_expr_non_empty)
+    $default  reduce using rule 116 (NUMBERS)
+
+
+State 111
+
+   79 arithmetic_expr_non_empty: REAL •
+  117 NUMBERS: REAL •
+
+    ']'       reduce using rule 79 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 79 (arithmetic_expr_non_empty)
+    $default  reduce using rule 117 (NUMBERS)
+
+
+State 112
+
+   75 expr: UNARY_OP • expr
+   87 arithmetic_expr_non_empty: UNARY_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 130
+    NUMBERS    go to state 24
+
+
+State 113
+
+   74 expr: LOGICAL_NOT_OP • expr
+   86 arithmetic_expr_non_empty: LOGICAL_NOT_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 131
+    NUMBERS    go to state 24
+
+
+State 114
+
+   68 expr: '(' • expr ')'
+   81 arithmetic_expr_non_empty: '(' • expr ')'
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 132
+    NUMBERS    go to state 24
+
+
+State 115
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   82 arithmetic_expr_non_empty: expr • EXPONENTIATION_OP expr
+   83                          | expr • CALC_OP expr
+   84                          | expr • RELATIONAL_OP expr
+   85                          | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 133
+    CALC_OP            shift, and go to state 134
+    RELATIONAL_OP      shift, and go to state 135
+    LOGICAL_AND_OR_OP  shift, and go to state 136
+
+
+State 116
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty • ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 KW_ENDFOR
+
+    ':'  shift, and go to state 137
+
+
+State 117
+
+   98 parameter_definition: IDENTIFIER '[' • POSINT ']' ':' KW_VARIABLE_TYPE
+   99                     | IDENTIFIER '[' • ']' ':' KW_VARIABLE_TYPE
+
+    POSINT  shift, and go to state 138
+    ']'     shift, and go to state 139
+
+
+State 118
+
+   97 parameter_definition: IDENTIFIER ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 140
+
+
+State 119
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments ')' • return_type ':' $@11 body $@12 KW_ENDDEF
+
+    KW_FUNC_RETURN  shift, and go to state 141
+
+    $default  reduce using rule 100 (return_type)
+
+    return_type  go to state 142
+
+
+State 120
+
+   96 arguments: arguments ',' • parameter_definition
+
+    IDENTIFIER  shift, and go to state 92
+
+    parameter_definition  go to state 143
+
+
+State 121
+
+   90 function_definition: KW_DEF KW_MAIN '(' ')' ':' • $@9 body $@10 KW_ENDDEF
+
+    $default  reduce using rule 88 ($@9)
+
+    $@9  go to state 144
+
+
+State 122
+
+   40 body_comp: KW_RETURN • expr_comp ';'
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 149
+    NUMBERS    go to state 150
+
+
+State 123
+
+   35 complicated_types: KW_COMP IDENTIFIER $@8 ':' body_comp • KW_ENDCOMP
+   37 body_comp: body_comp • attribute_definition ';'
+   38          | body_comp • function_definition_comp ';'
+   39          | body_comp • expr_comp ';'
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    KW_DEF          shift, and go to state 151
+    KW_ENDCOMP      shift, and go to state 152
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 153
+
+    $default  reduce using rule 46 (expr_comp)
+
+    attribute_definition      go to state 154
+    function_definition_comp  go to state 155
+    expr_comp                 go to state 156
+    NUMBERS                   go to state 150
+
+
+State 124
+
+  107 variable_definition: KW_CONST IDENTIFIER ASSIGNMENT_OP VALUE ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 157
+
+
+State 125
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER • ':' POSINT ']' ':' KW_VARIABLE_TYPE
+   21         | IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER • ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+
+    ':'  shift, and go to state 158
+
+
+State 126
+
+  105 variable_definition: IDENTIFIER '[' POSINT ']' ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 105 (variable_definition)
+
+
+State 127
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   77     | IDENTIFIER '[' expr ']' ASSIGNMENT_OP expr •
+
+    $default  reduce using rule 77 (expr)
+
+
+State 128
+
+   13 commands: KW_IF '(' expr ')' ':' $@1 • stmts $@2 else_statement KW_ENDIF
+
+    $default  reduce using rule 27 (stmts)
+
+    stmts  go to state 159
+
+
+State 129
+
+   16 commands: KW_WHILE '(' expr ')' ':' $@3 • stmts $@4 KW_ENDWHILE
+
+    $default  reduce using rule 27 (stmts)
+
+    stmts  go to state 160
+
+
+State 130
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   75     | UNARY_OP expr •
+   87 arithmetic_expr_non_empty: UNARY_OP expr •
+
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    ']'       reduce using rule 87 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 87 (arithmetic_expr_non_empty)
+    $default  reduce using rule 75 (expr)
+
+
+State 131
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   74     | LOGICAL_NOT_OP expr •
+   86 arithmetic_expr_non_empty: LOGICAL_NOT_OP expr •
+
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    ']'       reduce using rule 86 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 86 (arithmetic_expr_non_empty)
+    $default  reduce using rule 74 (expr)
+
+
+State 132
+
+   68 expr: '(' expr • ')'
+   70     | expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   81 arithmetic_expr_non_empty: '(' expr • ')'
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ')'                shift, and go to state 161
+
+
+State 133
+
+   71 expr: expr EXPONENTIATION_OP • expr
+   82 arithmetic_expr_non_empty: expr EXPONENTIATION_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 162
+    NUMBERS    go to state 24
+
+
+State 134
+
+   70 expr: expr CALC_OP • expr
+   83 arithmetic_expr_non_empty: expr CALC_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 163
+    NUMBERS    go to state 24
+
+
+State 135
+
+   72 expr: expr RELATIONAL_OP • expr
+   84 arithmetic_expr_non_empty: expr RELATIONAL_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 164
+    NUMBERS    go to state 24
+
+
+State 136
+
+   73 expr: expr LOGICAL_AND_OR_OP • expr
+   85 arithmetic_expr_non_empty: expr LOGICAL_AND_OR_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 165
+    NUMBERS    go to state 24
+
+
+State 137
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' • arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 KW_ENDFOR
+
+    IDENTIFIER      shift, and go to state 109
+    POSINT          shift, and go to state 110
+    REAL            shift, and go to state 111
+    UNARY_OP        shift, and go to state 112
+    LOGICAL_NOT_OP  shift, and go to state 113
+    '('             shift, and go to state 114
+
+    func_call                  go to state 20
+    expr                       go to state 115
+    arithmetic_expr_non_empty  go to state 166
+    NUMBERS                    go to state 24
+
+
+State 138
+
+   98 parameter_definition: IDENTIFIER '[' POSINT • ']' ':' KW_VARIABLE_TYPE
+
+    ']'  shift, and go to state 167
+
+
+State 139
+
+   99 parameter_definition: IDENTIFIER '[' ']' • ':' KW_VARIABLE_TYPE
+
+    ':'  shift, and go to state 168
+
+
+State 140
+
+   97 parameter_definition: IDENTIFIER ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 97 (parameter_definition)
+
+
+State 141
+
+  101 return_type: KW_FUNC_RETURN • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 169
+
+
+State 142
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments ')' return_type • ':' $@11 body $@12 KW_ENDDEF
+
+    ':'  shift, and go to state 170
+
+
+State 143
+
+   96 arguments: arguments ',' parameter_definition •
+
+    $default  reduce using rule 96 (arguments)
+
+
+State 144
+
+   90 function_definition: KW_DEF KW_MAIN '(' ')' ':' $@9 • body $@10 KW_ENDDEF
+
+    $default  reduce using rule 27 (stmts)
+
+    stmts  go to state 171
+    body   go to state 172
+
+
+State 145
+
+   56 expr_comp: UNARY_OP • expr_comp
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 173
+    NUMBERS    go to state 150
+
+
+State 146
+
+   55 expr_comp: LOGICAL_NOT_OP • expr_comp
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 174
+    NUMBERS    go to state 150
+
+
+State 147
+
+   50 expr_comp: '(' • expr_comp ')'
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 175
+    NUMBERS    go to state 150
+
+
+State 148
+
+   48 expr_comp: '#' • IDENTIFIER
+   49          | '#' • IDENTIFIER '[' expr ']'
+   57          | '#' • IDENTIFIER ASSIGNMENT_OP expr_comp
+   58          | '#' • IDENTIFIER '[' expr_comp ']' ASSIGNMENT_OP expr_comp
+
+    IDENTIFIER  shift, and go to state 176
+
+
+State 149
+
+   40 body_comp: KW_RETURN expr_comp • ';'
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+
+    EXPONENTIATION_OP  shift, and go to state 177
+    CALC_OP            shift, and go to state 178
+    RELATIONAL_OP      shift, and go to state 179
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+    ';'                shift, and go to state 181
+
+
+State 150
+
+   47 expr_comp: NUMBERS •
+
+    $default  reduce using rule 47 (expr_comp)
+
+
+State 151
+
+   43 function_definition_comp: KW_DEF • IDENTIFIER '(' arguments ')' return_type_comp ':' body_comp KW_ENDDEF
+
+    IDENTIFIER  shift, and go to state 182
+
+
+State 152
+
+   35 complicated_types: KW_COMP IDENTIFIER $@8 ':' body_comp KW_ENDCOMP •
+
+    $default  reduce using rule 35 (complicated_types)
+
+
+State 153
+
+   41 attribute_definition: '#' • IDENTIFIER ':' KW_VARIABLE_TYPE
+   42                     | '#' • IDENTIFIER ',' attribute_definition
+   48 expr_comp: '#' • IDENTIFIER
+   49          | '#' • IDENTIFIER '[' expr ']'
+   57          | '#' • IDENTIFIER ASSIGNMENT_OP expr_comp
+   58          | '#' • IDENTIFIER '[' expr_comp ']' ASSIGNMENT_OP expr_comp
+
+    IDENTIFIER  shift, and go to state 183
+
+
+State 154
+
+   37 body_comp: body_comp attribute_definition • ';'
+
+    ';'  shift, and go to state 184
+
+
+State 155
+
+   38 body_comp: body_comp function_definition_comp • ';'
+
+    ';'  shift, and go to state 185
+
+
+State 156
+
+   39 body_comp: body_comp expr_comp • ';'
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+
+    EXPONENTIATION_OP  shift, and go to state 177
+    CALC_OP            shift, and go to state 178
+    RELATIONAL_OP      shift, and go to state 179
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+    ';'                shift, and go to state 186
+
+
+State 157
+
+  107 variable_definition: KW_CONST IDENTIFIER ASSIGNMENT_OP VALUE ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 107 (variable_definition)
+
+
+State 158
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' • POSINT ']' ':' KW_VARIABLE_TYPE
+   21         | IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' • KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    POSINT      shift, and go to state 187
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 188
+
+
+State 159
+
+   13 commands: KW_IF '(' expr ')' ':' $@1 stmts • $@2 else_statement KW_ENDIF
+   28 stmts: stmts • loop_thing ';'
+   29      | stmts • variable_definition ';'
+   30      | stmts • expr ';'
+   31      | stmts • commands ';'
+
+    IDENTIFIER      shift, and go to state 4
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    KW_IF           shift, and go to state 7
+    KW_WHILE        shift, and go to state 8
+    KW_FOR          shift, and go to state 9
+    KW_BREAK        shift, and go to state 189
+    KW_CONTINUE     shift, and go to state 190
+    KW_CONST        shift, and go to state 13
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 12 ($@2)
+
+    commands             go to state 191
+    $@2                  go to state 192
+    loop_thing           go to state 193
+    func_call            go to state 20
+    expr                 go to state 194
+    variable_definition  go to state 195
+    NUMBERS              go to state 24
+    variable_list        go to state 25
+
+
+State 160
+
+   16 commands: KW_WHILE '(' expr ')' ':' $@3 stmts • $@4 KW_ENDWHILE
+   28 stmts: stmts • loop_thing ';'
+   29      | stmts • variable_definition ';'
+   30      | stmts • expr ';'
+   31      | stmts • commands ';'
+
+    IDENTIFIER      shift, and go to state 4
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    KW_IF           shift, and go to state 7
+    KW_WHILE        shift, and go to state 8
+    KW_FOR          shift, and go to state 9
+    KW_BREAK        shift, and go to state 189
+    KW_CONTINUE     shift, and go to state 190
+    KW_CONST        shift, and go to state 13
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 15 ($@4)
+
+    commands             go to state 191
+    $@4                  go to state 196
+    loop_thing           go to state 193
+    func_call            go to state 20
+    expr                 go to state 194
+    variable_definition  go to state 195
+    NUMBERS              go to state 24
+    variable_list        go to state 25
+
+
+State 161
+
+   68 expr: '(' expr ')' •
+   81 arithmetic_expr_non_empty: '(' expr ')' •
+
+    ']'       reduce using rule 81 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 81 (arithmetic_expr_non_empty)
+    $default  reduce using rule 68 (expr)
+
+
+State 162
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   71     | expr EXPONENTIATION_OP expr •
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   82 arithmetic_expr_non_empty: expr EXPONENTIATION_OP expr •
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    $default  reduce using rule 82 (arithmetic_expr_non_empty)
+
+
+State 163
+
+   70 expr: expr • CALC_OP expr
+   70     | expr CALC_OP expr •
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   83 arithmetic_expr_non_empty: expr CALC_OP expr •
+
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    ']'       reduce using rule 83 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 83 (arithmetic_expr_non_empty)
+    $default  reduce using rule 70 (expr)
+
+
+State 164
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   72     | expr RELATIONAL_OP expr •
+   73     | expr • LOGICAL_AND_OR_OP expr
+   84 arithmetic_expr_non_empty: expr RELATIONAL_OP expr •
+
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+
+    ']'       reduce using rule 84 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 84 (arithmetic_expr_non_empty)
+    $default  reduce using rule 72 (expr)
+
+
+State 165
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+   73     | expr LOGICAL_AND_OR_OP expr •
+   85 arithmetic_expr_non_empty: expr LOGICAL_AND_OR_OP expr •
+
+    ']'       reduce using rule 85 (arithmetic_expr_non_empty)
+    ':'       reduce using rule 85 (arithmetic_expr_non_empty)
+    $default  reduce using rule 73 (expr)
+
+
+State 166
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty • step ']' ':' $@5 stmts $@6 KW_ENDFOR
+
+    ':'  shift, and go to state 197
+
+    $default  reduce using rule 25 (step)
+
+    step  go to state 198
+
+
+State 167
+
+   98 parameter_definition: IDENTIFIER '[' POSINT ']' • ':' KW_VARIABLE_TYPE
+
+    ':'  shift, and go to state 199
+
+
+State 168
+
+   99 parameter_definition: IDENTIFIER '[' ']' ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 200
+
+
+State 169
+
+  101 return_type: KW_FUNC_RETURN KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 101 (return_type)
+
+
+State 170
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments ')' return_type ':' • $@11 body $@12 KW_ENDDEF
+
+    $default  reduce using rule 91 ($@11)
+
+    $@11  go to state 201
+
+
+State 171
+
+   28 stmts: stmts • loop_thing ';'
+   29      | stmts • variable_definition ';'
+   30      | stmts • expr ';'
+   31      | stmts • commands ';'
+  102 body: stmts •
+  103     | stmts • KW_RETURN expr ';'
+
+    IDENTIFIER      shift, and go to state 4
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    KW_IF           shift, and go to state 7
+    KW_WHILE        shift, and go to state 8
+    KW_FOR          shift, and go to state 9
+    KW_BREAK        shift, and go to state 189
+    KW_CONTINUE     shift, and go to state 190
+    KW_RETURN       shift, and go to state 202
+    KW_CONST        shift, and go to state 13
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 102 (body)
+
+    commands             go to state 191
+    loop_thing           go to state 193
+    func_call            go to state 20
+    expr                 go to state 194
+    variable_definition  go to state 195
+    NUMBERS              go to state 24
+    variable_list        go to state 25
+
+
+State 172
+
+   90 function_definition: KW_DEF KW_MAIN '(' ')' ':' $@9 body • $@10 KW_ENDDEF
+
+    $default  reduce using rule 89 ($@10)
+
+    $@10  go to state 203
+
+
+State 173
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+   56          | UNARY_OP expr_comp •
+
+    RELATIONAL_OP      shift, and go to state 179
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+
+    $default  reduce using rule 56 (expr_comp)
+
+
+State 174
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+   55          | LOGICAL_NOT_OP expr_comp •
+
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+
+    $default  reduce using rule 55 (expr_comp)
+
+
+State 175
+
+   50 expr_comp: '(' expr_comp • ')'
+   51          | expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+
+    EXPONENTIATION_OP  shift, and go to state 177
+    CALC_OP            shift, and go to state 178
+    RELATIONAL_OP      shift, and go to state 179
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+    ')'                shift, and go to state 204
+
+
+State 176
+
+   48 expr_comp: '#' IDENTIFIER •
+   49          | '#' IDENTIFIER • '[' expr ']'
+   57          | '#' IDENTIFIER • ASSIGNMENT_OP expr_comp
+   58          | '#' IDENTIFIER • '[' expr_comp ']' ASSIGNMENT_OP expr_comp
+
+    ASSIGNMENT_OP  shift, and go to state 205
+    '['            shift, and go to state 206
+
+    $default  reduce using rule 48 (expr_comp)
+
+
+State 177
+
+   51 expr_comp: expr_comp EXPONENTIATION_OP • expr_comp
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 207
+    NUMBERS    go to state 150
+
+
+State 178
+
+   52 expr_comp: expr_comp CALC_OP • expr_comp
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 208
+    NUMBERS    go to state 150
+
+
+State 179
+
+   53 expr_comp: expr_comp RELATIONAL_OP • expr_comp
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 209
+    NUMBERS    go to state 150
+
+
+State 180
+
+   54 expr_comp: expr_comp LOGICAL_AND_OR_OP • expr_comp
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 210
+    NUMBERS    go to state 150
+
+
+State 181
+
+   40 body_comp: KW_RETURN expr_comp ';' •
+
+    $default  reduce using rule 40 (body_comp)
+
+
+State 182
+
+   43 function_definition_comp: KW_DEF IDENTIFIER • '(' arguments ')' return_type_comp ':' body_comp KW_ENDDEF
+
+    '('  shift, and go to state 211
+
+
+State 183
+
+   41 attribute_definition: '#' IDENTIFIER • ':' KW_VARIABLE_TYPE
+   42                     | '#' IDENTIFIER • ',' attribute_definition
+   48 expr_comp: '#' IDENTIFIER •
+   49          | '#' IDENTIFIER • '[' expr ']'
+   57          | '#' IDENTIFIER • ASSIGNMENT_OP expr_comp
+   58          | '#' IDENTIFIER • '[' expr_comp ']' ASSIGNMENT_OP expr_comp
+
+    ASSIGNMENT_OP  shift, and go to state 205
+    '['            shift, and go to state 206
+    ':'            shift, and go to state 212
+    ','            shift, and go to state 213
+
+    $default  reduce using rule 48 (expr_comp)
+
+
+State 184
+
+   37 body_comp: body_comp attribute_definition ';' •
+
+    $default  reduce using rule 37 (body_comp)
+
+
+State 185
+
+   38 body_comp: body_comp function_definition_comp ';' •
+
+    $default  reduce using rule 38 (body_comp)
+
+
+State 186
+
+   39 body_comp: body_comp expr_comp ';' •
+
+    $default  reduce using rule 39 (body_comp)
+
+
+State 187
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' POSINT • ']' ':' KW_VARIABLE_TYPE
+
+    ']'  shift, and go to state 214
+
+
+State 188
+
+   21 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE • KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+
+    KW_IN  shift, and go to state 215
+
+
+State 189
+
+   32 loop_thing: KW_BREAK •
+
+    $default  reduce using rule 32 (loop_thing)
+
+
+State 190
+
+   33 loop_thing: KW_CONTINUE •
+
+    $default  reduce using rule 33 (loop_thing)
+
+
+State 191
+
+   31 stmts: stmts commands • ';'
+
+    ';'  shift, and go to state 216
+
+
+State 192
+
+   13 commands: KW_IF '(' expr ')' ':' $@1 stmts $@2 • else_statement KW_ENDIF
+
+    KW_ELSE  shift, and go to state 217
+
+    $default  reduce using rule 22 (else_statement)
+
+    else_statement  go to state 218
+
+
+State 193
+
+   28 stmts: stmts loop_thing • ';'
+
+    ';'  shift, and go to state 219
+
+
+State 194
+
+   30 stmts: stmts expr • ';'
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ';'                shift, and go to state 220
+
+
+State 195
+
+   29 stmts: stmts variable_definition • ';'
+
+    ';'  shift, and go to state 221
+
+
+State 196
+
+   16 commands: KW_WHILE '(' expr ')' ':' $@3 stmts $@4 • KW_ENDWHILE
+
+    KW_ENDWHILE  shift, and go to state 222
+
+
+State 197
+
+   26 step: ':' • arithmetic_expr_non_empty
+
+    IDENTIFIER      shift, and go to state 109
+    POSINT          shift, and go to state 110
+    REAL            shift, and go to state 111
+    UNARY_OP        shift, and go to state 112
+    LOGICAL_NOT_OP  shift, and go to state 113
+    '('             shift, and go to state 114
+
+    func_call                  go to state 20
+    expr                       go to state 115
+    arithmetic_expr_non_empty  go to state 223
+    NUMBERS                    go to state 24
+
+
+State 198
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step • ']' ':' $@5 stmts $@6 KW_ENDFOR
+
+    ']'  shift, and go to state 224
+
+
+State 199
+
+   98 parameter_definition: IDENTIFIER '[' POSINT ']' ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 225
+
+
+State 200
+
+   99 parameter_definition: IDENTIFIER '[' ']' ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 99 (parameter_definition)
+
+
+State 201
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments ')' return_type ':' $@11 • body $@12 KW_ENDDEF
+
+    $default  reduce using rule 27 (stmts)
+
+    stmts  go to state 171
+    body   go to state 226
+
+
+State 202
+
+  103 body: stmts KW_RETURN • expr ';'
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    func_call  go to state 20
+    expr       go to state 227
+    NUMBERS    go to state 24
+
+
+State 203
+
+   90 function_definition: KW_DEF KW_MAIN '(' ')' ':' $@9 body $@10 • KW_ENDDEF
+
+    KW_ENDDEF  shift, and go to state 228
+
+
+State 204
+
+   50 expr_comp: '(' expr_comp ')' •
+
+    $default  reduce using rule 50 (expr_comp)
+
+
+State 205
+
+   57 expr_comp: '#' IDENTIFIER ASSIGNMENT_OP • expr_comp
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 229
+    NUMBERS    go to state 150
+
+
+State 206
+
+   49 expr_comp: '#' IDENTIFIER '[' • expr ']'
+   58          | '#' IDENTIFIER '[' • expr_comp ']' ASSIGNMENT_OP expr_comp
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 230
+    LOGICAL_NOT_OP  shift, and go to state 231
+    '('             shift, and go to state 232
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 233
+    func_call  go to state 20
+    expr       go to state 234
+    NUMBERS    go to state 235
+
+
+State 207
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   51          | expr_comp EXPONENTIATION_OP expr_comp •
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+
+    EXPONENTIATION_OP  shift, and go to state 177
+    CALC_OP            shift, and go to state 178
+    RELATIONAL_OP      shift, and go to state 179
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+
+    $default  reduce using rule 51 (expr_comp)
+
+
+State 208
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   52          | expr_comp CALC_OP expr_comp •
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+
+    RELATIONAL_OP      shift, and go to state 179
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+
+    $default  reduce using rule 52 (expr_comp)
+
+
+State 209
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   53          | expr_comp RELATIONAL_OP expr_comp •
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+
+    $default  reduce using rule 53 (expr_comp)
+
+
+State 210
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+   54          | expr_comp LOGICAL_AND_OR_OP expr_comp •
+
+    $default  reduce using rule 54 (expr_comp)
+
+
+State 211
+
+   43 function_definition_comp: KW_DEF IDENTIFIER '(' • arguments ')' return_type_comp ':' body_comp KW_ENDDEF
+
+    IDENTIFIER  shift, and go to state 92
+
+    $default  reduce using rule 94 (arguments)
+
+    arguments             go to state 236
+    parameter_definition  go to state 94
+
+
+State 212
+
+   41 attribute_definition: '#' IDENTIFIER ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 237
+
+
+State 213
+
+   42 attribute_definition: '#' IDENTIFIER ',' • attribute_definition
+
+    '#'  shift, and go to state 238
+
+    attribute_definition  go to state 239
+
+
+State 214
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' POSINT ']' • ':' KW_VARIABLE_TYPE
+
+    ':'  shift, and go to state 240
+
+
+State 215
+
+   21 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN • IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 241
+
+
+State 216
+
+   31 stmts: stmts commands ';' •
+
+    $default  reduce using rule 31 (stmts)
+
+
+State 217
+
+   24 else_statement: KW_ELSE • ':' $@7 stmts
+
+    ':'  shift, and go to state 242
+
+
+State 218
+
+   13 commands: KW_IF '(' expr ')' ':' $@1 stmts $@2 else_statement • KW_ENDIF
+
+    KW_ENDIF  shift, and go to state 243
+
+
+State 219
+
+   28 stmts: stmts loop_thing ';' •
+
+    $default  reduce using rule 28 (stmts)
+
+
+State 220
+
+   30 stmts: stmts expr ';' •
+
+    $default  reduce using rule 30 (stmts)
+
+
+State 221
+
+   29 stmts: stmts variable_definition ';' •
+
+    $default  reduce using rule 29 (stmts)
+
+
+State 222
+
+   16 commands: KW_WHILE '(' expr ')' ':' $@3 stmts $@4 KW_ENDWHILE •
+
+    $default  reduce using rule 16 (commands)
+
+
+State 223
+
+   26 step: ':' arithmetic_expr_non_empty •
+
+    $default  reduce using rule 26 (step)
+
+
+State 224
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' • ':' $@5 stmts $@6 KW_ENDFOR
+
+    ':'  shift, and go to state 244
+
+
+State 225
+
+   98 parameter_definition: IDENTIFIER '[' POSINT ']' ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 98 (parameter_definition)
+
+
+State 226
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments ')' return_type ':' $@11 body • $@12 KW_ENDDEF
+
+    $default  reduce using rule 92 ($@12)
+
+    $@12  go to state 245
+
+
+State 227
+
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+  103 body: stmts KW_RETURN expr • ';'
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ';'                shift, and go to state 246
+
+
+State 228
+
+   90 function_definition: KW_DEF KW_MAIN '(' ')' ':' $@9 body $@10 KW_ENDDEF •
+
+    $default  reduce using rule 90 (function_definition)
+
+
+State 229
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+   57          | '#' IDENTIFIER ASSIGNMENT_OP expr_comp •
+
+    $default  reduce using rule 57 (expr_comp)
+
+
+State 230
+
+   56 expr_comp: UNARY_OP • expr_comp
+   75 expr: UNARY_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 230
+    LOGICAL_NOT_OP  shift, and go to state 231
+    '('             shift, and go to state 232
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 173
+    func_call  go to state 20
+    expr       go to state 38
+    NUMBERS    go to state 235
+
+
+State 231
+
+   55 expr_comp: LOGICAL_NOT_OP • expr_comp
+   74 expr: LOGICAL_NOT_OP • expr
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 230
+    LOGICAL_NOT_OP  shift, and go to state 231
+    '('             shift, and go to state 232
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 174
+    func_call  go to state 20
+    expr       go to state 39
+    NUMBERS    go to state 235
+
+
+State 232
+
+   50 expr_comp: '(' • expr_comp ')'
+   68 expr: '(' • expr ')'
+
+    IDENTIFIER      shift, and go to state 37
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 230
+    LOGICAL_NOT_OP  shift, and go to state 231
+    '('             shift, and go to state 232
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 175
+    func_call  go to state 20
+    expr       go to state 40
+    NUMBERS    go to state 235
+
+
+State 233
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+   58          | '#' IDENTIFIER '[' expr_comp • ']' ASSIGNMENT_OP expr_comp
+
+    EXPONENTIATION_OP  shift, and go to state 177
+    CALC_OP            shift, and go to state 178
+    RELATIONAL_OP      shift, and go to state 179
+    LOGICAL_AND_OR_OP  shift, and go to state 180
+    ']'                shift, and go to state 247
+
+
+State 234
+
+   49 expr_comp: '#' IDENTIFIER '[' expr • ']'
+   70 expr: expr • CALC_OP expr
+   71     | expr • EXPONENTIATION_OP expr
+   72     | expr • RELATIONAL_OP expr
+   73     | expr • LOGICAL_AND_OR_OP expr
+
+    EXPONENTIATION_OP  shift, and go to state 43
+    CALC_OP            shift, and go to state 44
+    RELATIONAL_OP      shift, and go to state 45
+    LOGICAL_AND_OR_OP  shift, and go to state 46
+    ']'                shift, and go to state 248
+
+
+State 235
+
+   47 expr_comp: NUMBERS •
+   66 expr: NUMBERS •
+
+    EXPONENTIATION_OP  reduce using rule 47 (expr_comp)
+    EXPONENTIATION_OP  [reduce using rule 66 (expr)]
+    CALC_OP            reduce using rule 47 (expr_comp)
+    CALC_OP            [reduce using rule 66 (expr)]
+    RELATIONAL_OP      reduce using rule 47 (expr_comp)
+    RELATIONAL_OP      [reduce using rule 66 (expr)]
+    LOGICAL_AND_OR_OP  reduce using rule 47 (expr_comp)
+    LOGICAL_AND_OR_OP  [reduce using rule 66 (expr)]
+    ')'                reduce using rule 47 (expr_comp)
+    ')'                [reduce using rule 66 (expr)]
+    ']'                reduce using rule 47 (expr_comp)
+    ']'                [reduce using rule 66 (expr)]
+    $default           reduce using rule 47 (expr_comp)
+
+
+State 236
+
+   43 function_definition_comp: KW_DEF IDENTIFIER '(' arguments • ')' return_type_comp ':' body_comp KW_ENDDEF
+   96 arguments: arguments • ',' parameter_definition
+
+    ')'  shift, and go to state 249
+    ','  shift, and go to state 120
+
+
+State 237
+
+   41 attribute_definition: '#' IDENTIFIER ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 41 (attribute_definition)
+
+
+State 238
+
+   41 attribute_definition: '#' • IDENTIFIER ':' KW_VARIABLE_TYPE
+   42                     | '#' • IDENTIFIER ',' attribute_definition
+
+    IDENTIFIER  shift, and go to state 250
+
+
+State 239
+
+   42 attribute_definition: '#' IDENTIFIER ',' attribute_definition •
+
+    $default  reduce using rule 42 (attribute_definition)
+
+
+State 240
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' POSINT ']' ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 251
+
+
+State 241
+
+   21 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER • KW_OF POSINT ']' ':' KW_VARIABLE_TYPE
+
+    KW_OF  shift, and go to state 252
+
+
+State 242
+
+   24 else_statement: KW_ELSE ':' • $@7 stmts
+
+    $default  reduce using rule 23 ($@7)
+
+    $@7  go to state 253
+
+
+State 243
+
+   13 commands: KW_IF '(' expr ')' ':' $@1 stmts $@2 else_statement KW_ENDIF •
+
+    $default  reduce using rule 13 (commands)
+
+
+State 244
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' • $@5 stmts $@6 KW_ENDFOR
+
+    $default  reduce using rule 17 ($@5)
+
+    $@5  go to state 254
+
+
+State 245
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments ')' return_type ':' $@11 body $@12 • KW_ENDDEF
+
+    KW_ENDDEF  shift, and go to state 255
+
+
+State 246
+
+  103 body: stmts KW_RETURN expr ';' •
+
+    $default  reduce using rule 103 (body)
+
+
+State 247
+
+   58 expr_comp: '#' IDENTIFIER '[' expr_comp ']' • ASSIGNMENT_OP expr_comp
+
+    ASSIGNMENT_OP  shift, and go to state 256
+
+
+State 248
+
+   49 expr_comp: '#' IDENTIFIER '[' expr ']' •
+
+    $default  reduce using rule 49 (expr_comp)
+
+
+State 249
+
+   43 function_definition_comp: KW_DEF IDENTIFIER '(' arguments ')' • return_type_comp ':' body_comp KW_ENDDEF
+
+    KW_FUNC_RETURN  shift, and go to state 257
+
+    $default  reduce using rule 44 (return_type_comp)
+
+    return_type_comp  go to state 258
+
+
+State 250
+
+   41 attribute_definition: '#' IDENTIFIER • ':' KW_VARIABLE_TYPE
+   42                     | '#' IDENTIFIER • ',' attribute_definition
+
+    ':'  shift, and go to state 212
+    ','  shift, and go to state 213
+
+
+State 251
+
+   20 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' POSINT ']' ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 20 (commands)
+
+
+State 252
+
+   21 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF • POSINT ']' ':' KW_VARIABLE_TYPE
+
+    POSINT  shift, and go to state 259
+
+
+State 253
+
+   24 else_statement: KW_ELSE ':' $@7 • stmts
+
+    $default  reduce using rule 27 (stmts)
+
+    stmts  go to state 260
+
+
+State 254
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 • stmts $@6 KW_ENDFOR
+
+    $default  reduce using rule 27 (stmts)
+
+    stmts  go to state 261
+
+
+State 255
+
+   93 function_definition: KW_DEF IDENTIFIER '(' arguments ')' return_type ':' $@11 body $@12 KW_ENDDEF •
+
+    $default  reduce using rule 93 (function_definition)
+
+
+State 256
+
+   58 expr_comp: '#' IDENTIFIER '[' expr_comp ']' ASSIGNMENT_OP • expr_comp
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 148
+
+    $default  reduce using rule 46 (expr_comp)
+
+    expr_comp  go to state 262
+    NUMBERS    go to state 150
+
+
+State 257
+
+   45 return_type_comp: KW_FUNC_RETURN • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 263
+
+
+State 258
+
+   43 function_definition_comp: KW_DEF IDENTIFIER '(' arguments ')' return_type_comp • ':' body_comp KW_ENDDEF
+
+    ':'  shift, and go to state 264
+
+
+State 259
+
+   21 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT • ']' ':' KW_VARIABLE_TYPE
+
+    ']'  shift, and go to state 265
+
+
+State 260
+
+   24 else_statement: KW_ELSE ':' $@7 stmts •
+   28 stmts: stmts • loop_thing ';'
+   29      | stmts • variable_definition ';'
+   30      | stmts • expr ';'
+   31      | stmts • commands ';'
+
+    IDENTIFIER      shift, and go to state 4
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    KW_IF           shift, and go to state 7
+    KW_WHILE        shift, and go to state 8
+    KW_FOR          shift, and go to state 9
+    KW_BREAK        shift, and go to state 189
+    KW_CONTINUE     shift, and go to state 190
+    KW_CONST        shift, and go to state 13
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 24 (else_statement)
+
+    commands             go to state 191
+    loop_thing           go to state 193
+    func_call            go to state 20
+    expr                 go to state 194
+    variable_definition  go to state 195
+    NUMBERS              go to state 24
+    variable_list        go to state 25
+
+
+State 261
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts • $@6 KW_ENDFOR
+   28 stmts: stmts • loop_thing ';'
+   29      | stmts • variable_definition ';'
+   30      | stmts • expr ';'
+   31      | stmts • commands ';'
+
+    IDENTIFIER      shift, and go to state 4
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    KW_IF           shift, and go to state 7
+    KW_WHILE        shift, and go to state 8
+    KW_FOR          shift, and go to state 9
+    KW_BREAK        shift, and go to state 189
+    KW_CONTINUE     shift, and go to state 190
+    KW_CONST        shift, and go to state 13
+    UNARY_OP        shift, and go to state 14
+    LOGICAL_NOT_OP  shift, and go to state 15
+    '('             shift, and go to state 16
+
+    $default  reduce using rule 18 ($@6)
+
+    commands             go to state 191
+    $@6                  go to state 266
+    loop_thing           go to state 193
+    func_call            go to state 20
+    expr                 go to state 194
+    variable_definition  go to state 195
+    NUMBERS              go to state 24
+    variable_list        go to state 25
+
+
+State 262
+
+   51 expr_comp: expr_comp • EXPONENTIATION_OP expr_comp
+   52          | expr_comp • CALC_OP expr_comp
+   53          | expr_comp • RELATIONAL_OP expr_comp
+   54          | expr_comp • LOGICAL_AND_OR_OP expr_comp
+   58          | '#' IDENTIFIER '[' expr_comp ']' ASSIGNMENT_OP expr_comp •
+
+    $default  reduce using rule 58 (expr_comp)
+
+
+State 263
+
+   45 return_type_comp: KW_FUNC_RETURN KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 45 (return_type_comp)
+
+
+State 264
+
+   43 function_definition_comp: KW_DEF IDENTIFIER '(' arguments ')' return_type_comp ':' • body_comp KW_ENDDEF
+
+    KW_RETURN  shift, and go to state 122
+
+    $default  reduce using rule 36 (body_comp)
+
+    body_comp  go to state 267
+
+
+State 265
+
+   21 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' • ':' KW_VARIABLE_TYPE
+
+    ':'  shift, and go to state 268
+
+
+State 266
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 • KW_ENDFOR
+
+    KW_ENDFOR  shift, and go to state 269
+
+
+State 267
+
+   37 body_comp: body_comp • attribute_definition ';'
+   38          | body_comp • function_definition_comp ';'
+   39          | body_comp • expr_comp ';'
+   43 function_definition_comp: KW_DEF IDENTIFIER '(' arguments ')' return_type_comp ':' body_comp • KW_ENDDEF
+
+    POSINT          shift, and go to state 5
+    REAL            shift, and go to state 6
+    KW_DEF          shift, and go to state 151
+    KW_ENDDEF       shift, and go to state 270
+    UNARY_OP        shift, and go to state 145
+    LOGICAL_NOT_OP  shift, and go to state 146
+    '('             shift, and go to state 147
+    '#'             shift, and go to state 153
+
+    $default  reduce using rule 46 (expr_comp)
+
+    attribute_definition      go to state 154
+    function_definition_comp  go to state 155
+    expr_comp                 go to state 156
+    NUMBERS                   go to state 150
+
+
+State 268
+
+   21 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' • KW_VARIABLE_TYPE
+
+    IDENTIFIER  shift, and go to state 76
+    KW_INTEGER  shift, and go to state 77
+    KW_SCALAR   shift, and go to state 78
+    KW_STR      shift, and go to state 79
+    KW_BOOLEAN  shift, and go to state 80
+
+    KW_VARIABLE_TYPE  go to state 271
+
+
+State 269
+
+   19 commands: KW_FOR IDENTIFIER KW_IN '[' arithmetic_expr_non_empty ':' arithmetic_expr_non_empty step ']' ':' $@5 stmts $@6 KW_ENDFOR •
+
+    $default  reduce using rule 19 (commands)
+
+
+State 270
+
+   43 function_definition_comp: KW_DEF IDENTIFIER '(' arguments ')' return_type_comp ':' body_comp KW_ENDDEF •
+
+    $default  reduce using rule 43 (function_definition_comp)
+
+
+State 271
+
+   21 commands: IDENTIFIER ASSIGNMENT_OP '[' expr KW_FOR IDENTIFIER ':' KW_VARIABLE_TYPE KW_IN IDENTIFIER KW_OF POSINT ']' ':' KW_VARIABLE_TYPE •
+
+    $default  reduce using rule 21 (commands)

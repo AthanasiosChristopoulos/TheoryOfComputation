@@ -1,0 +1,158 @@
+
+%precedence POSINT
+%precedence IDENTIFIER
+%precedence ']'
+%precedence '['
+
+"+"         { yylval.str = strdup(yytext); return KW_PLUS; }
+"-"         { yylval.str = strdup(yytext); return KW_MINUS; }
+"*"         { yylval.str = strdup(yytext); return KW_MUL; }
+"/"         { yylval.str = strdup(yytext); return KW_DIV; }
+"%"         { yylval.str = strdup(yytext); return KW_MOD; }
+
+"<="        { yylval.str = strdup(yytext); return KW_LESSEQUAL; }
+">="        { yylval.str = strdup(yytext); return KW_GREATEREQUAL; }
+"<"         { yylval.str = strdup(yytext); return KW_LESSTHAN; }
+">"         { yylval.str = strdup(yytext); return KW_GREATHAN; }
+"!="        { yylval.str = strdup(yytext); return KW_INEQ; }
+
+"&&"        { yylval.str = strdup(yytext); return KW_AND; }
+"||"        { yylval.str = strdup(yytext); return KW_OR; }
+"!"         { yylval.str = strdup(yytext); return KW_NOT; }
+
+"="         { yylval.str = strdup(yytext); return KW_EQUAL; }
+
+"**"        { yylval.str = strdup(yytext); return KW_EXPONENT; }
+
+
+complicated_types:
+  KW_COMP IDENTIFIER { func_to_define_comp = $2; }
+  ':' body_comp KW_ENDCOMP 
+  { 
+    comp = 1;   
+    add_identifier($2);
+
+    // Store component name
+    char* structName = $2;
+
+    // Generate function declarations
+    char* funcDeclarations = "";
+    char* funcImplementations = "";
+    for (int i = 0; i < function_list_count; i++) {
+      char* func = list_of_comp_functions[i];
+
+      // Convert function definition to a C-style function pointer declaration
+      char* funcPointer = template("  %s (*%s)(struct %s* self);", extract_return_type(func), extract_func_name(func), structName);
+      funcDeclarations = concat(funcDeclarations, funcPointer);
+
+      // Convert function body to a standard function implementation
+      char* funcImplementation = template("%s %s(struct %s* self%s) {\n%s\n}\n", 
+                                          extract_return_type(func), 
+                                          extract_func_name(func), 
+                                          structName, 
+                                          extract_function_args(func), 
+                                          extract_function_body(func));
+      funcImplementations = concat(funcImplementations, funcImplementation);
+    }
+
+    // Generate constructor struct initialization
+    char* ctorInit = template("%s ctor_%s = { .%s };\n", structName, structName, generate_ctor_initialization(structName));
+
+    // Generate final struct definition
+    $$ = template("typedef struct %s {\n%s\n%s\n} %s;\n\n%s\n%s\n", 
+                  structName, $5, funcDeclarations, structName, funcImplementations, ctorInit);
+
+    comp = 0; 
+    clear_function_list();
+  }
+;
+
+body_comp: 
+    %empty                                        { $$ = ""; }
+  | body_comp attribute_definition ';'           { $$ = template("%s  %s;\n", $1, $2); }
+  | body_comp function_definition_comp ';'       { $$ = template("%s  %s;\n", $1, $2); }
+  | body_comp expr_comp ';'                      { assignment_made = 0; $$ = template("%s    %s;\n", $1, $2); }
+  | KW_RETURN expr_comp ';'                      { body_has_return_type = 1; $$ = template("    return %s;\n", $2); }
+;
+
+attribute_definition:
+  '#' IDENTIFIER ':' KW_VARIABLE_TYPE            { add_identifier($2); $$ = template("  %s %s;", $4, $2); }
+ | '#' IDENTIFIER ',' attribute_definition      { add_identifier($2); $$ = template("  %s %s;\n%s", $4, $2, $4); }
+;
+
+function_definition_comp:
+  KW_DEF IDENTIFIER '(' arguments ')' return_type_comp ':' body_comp KW_ENDDEF 
+  {
+    if (func_needs_return_type != body_has_return_type) {  
+      yyerror("Return statement missing from body"); 
+      YYABORT;
+    }
+
+    char* functionName = $2;
+    char* returnType = extract_return_type($6);
+    char* functionArgs = extract_function_args($4);
+    char* functionBody = $8;
+
+    // Store function in list for struct declaration
+    add_function(functionName, num_of_args_in_function);  
+    num_of_args_in_function = 0;
+    append_to_function_list(template("%s %s(%s) {\n%s\n}", returnType, functionName, functionArgs, functionBody));
+
+    // Function declaration in struct
+    $$ = template("%s (*%s)(struct %s* self%s);", returnType, functionName, func_to_define_comp, functionArgs);
+    
+    func_needs_return_type = 0;
+    body_has_return_type = 0;
+  }
+;
+
+return_type_comp:
+   %empty                               { $$ = "void"; } 
+ | KW_FUNC_RETURN KW_VARIABLE_TYPE      { func_needs_return_type = 1; $$ = template("%s", $2); }
+;
+
+comp Circle:
+    #x, #y: scalar;
+    #radius: scalar;
+    def area() -> scalar: return 3.14 * (#radius ** 2); enddef;
+    def perimeter() -> scalar: return 2 * 3.14 * #radius; enddef;
+endcomp;
+
+#include <stdio.h>
+
+typedef struct Circle {
+    double x, y;     // Scalar values for position
+    double radius;   // Scalar value for radius
+
+    // Function pointers for methods
+    double (*area)(struct Circle *self);
+    double (*perimeter)(struct Circle *self);
+} Circle;
+
+// Function definitions
+double Circle_area(struct Circle *self) {
+    return 3.14 * (self->radius * self->radius);
+}
+
+double Circle_perimeter(struct Circle *self) {
+    return 2 * 3.14 * self->radius;
+}
+
+// Constructor-like initializer
+Circle ctor_Circle = { .area = Circle_area, .perimeter = Circle_perimeter };
+
+int main() {
+    // Creating a Circle instance
+    Circle myCircle = ctor_Circle;
+    myCircle.x = 0.0;
+    myCircle.y = 0.0;
+    myCircle.radius = 5.0;
+
+    // Calling methods
+    printf("Area: %f\n", myCircle.area(&myCircle));
+    printf("Perimeter: %f\n", myCircle.perimeter(&myCircle));
+
+    return 0;
+}
+
+
